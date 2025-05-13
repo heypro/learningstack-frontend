@@ -1,0 +1,26 @@
+# Node modules
+node_modules/
+
+# Build output
+dist/
+
+# Vite cache
+.vite/
+
+# Logs
+*.log
+
+# OS crap
+.DS_Store
+Thumbs.db
+
+# Env vars
+.env
+.env.*
+
+# IDE configs
+.vscode/
+.idea/
+
+# Optional
+coverage/
