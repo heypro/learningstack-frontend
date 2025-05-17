@@ -26,10 +26,10 @@ function App() {
 
   return (
     <div className="p-4">
-      <h1>Telegram Mini App Test</h1>
+      <h1>FUCK THIS</h1>
       {user ? (
         <div>
-          <p>Hello, {user.first_name} (@{user.username})</p>
+          <p>, {user.first_name} (@{user.username})</p>
           {user.photo_url && (
             <img
               src={user.photo_url}
