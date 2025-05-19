@@ -11,6 +11,7 @@ function App() {
     async function authorize() {
       try {
         const initDataRaw = retrieveRawInitData();
+        console.log("initDataRaw:", initDataRaw);
 
         const res = await fetch('/api/auth/', {
           method: 'POST',
