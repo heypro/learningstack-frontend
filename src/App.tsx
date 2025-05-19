@@ -1,47 +1,56 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
+import { retrieveRawInitData } from '@telegram-apps/sdk';
 
-type WebAppUser = {
-  id: number
-  first_name: string
-  last_name?: string
-  username?: string
-  language_code?: string
-  photo_url?: string
-  is_premium?: boolean
-}
+type UserData = Record<string, string>;
 
 function App() {
-  const [user, setUser] = useState<WebAppUser | null>(null)
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const tg = window.Telegram.WebApp
-    tg.ready()
+    async function authorize() {
+      try {
+        const initDataRaw = retrieveRawInitData();
 
-    // WARNING: This is not validated — for real apps, use tg.initData and validate server-side
-    const unsafeData = tg.initDataUnsafe?.user
-    if (unsafeData) {
-      setUser(unsafeData)
+        const res = await fetch('/api/auth/', {
+          method: 'POST',
+          headers: {
+            Authorization: `tma ${initDataRaw}`,
+          },
+        });
+
+        if (!res.ok) {
+          const errText = await res.text();
+          setError(`Auth failed: ${errText}`);
+          return;
+        }
+
+        const data: UserData = await res.json();
+        setUserData(data);
+      } catch (e: any) {
+        setError(`Error: ${e.message || 'Unknown error'}`);
+      }
     }
-  }, [])
+
+    authorize();
+  }, []);
+
+  if (error) return <div>Error: {error}</div>;
+
+  if (!userData) return <div>Loading...</div>;
 
   return (
-    <div className="p-4">
-      <h1>Telegram Mini App Test</h1>
-      {user ? (
-        <div>
-          <p>Hello, {user.first_name} (@{user.username})</p>
-          {user.photo_url && (
-            <img
-              src={user.photo_url}
-              alt="User profile"
-              style={{ width: 100, borderRadius: '50%' }}
-            />
-          )}
-        </div>
-      ) : (
-        <p>Loading user data...</p>
-      )}
+    <div>
+      <h1>User Data</h1>
+      <ul>
+        {Object.entries(userData).map(([key, value]) => (
+          <li key={key}>
+            <b>{key}</b>: {value}
+          </li>
+        ))}
+      </ul>
     </div>
-  )
+  );
 }
-export default App
+
+export default App;
