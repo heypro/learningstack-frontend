@@ -11,6 +11,7 @@ function App() {
     async function authorize() {
       try {
         const { initDataRaw, initData } = retrieveLaunchParams();
+        console.log(initData)
         console.log("initDataRaw:", initDataRaw);
 
         const res = await fetch('/api/auth/', {
