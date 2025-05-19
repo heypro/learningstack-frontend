@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { retrieveRawInitData } from '@telegram-apps/sdk';
 
 type UserData = Record<string, string>;
