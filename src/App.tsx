@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { retrieveRawInitData } from '@telegram-apps/sdk';
+import { retrieveLaunchParams } from '@telegram-apps/sdk';
 
 type UserData = Record<string, string>;
 
@@ -10,7 +10,7 @@ function App() {
   useEffect(() => {
     async function authorize() {
       try {
-        const initDataRaw = retrieveRawInitData();
+        const { initDataRaw, initData } = retrieveLaunchParams();
         console.log("initDataRaw:", initDataRaw);
 
         const res = await fetch('/api/auth/', {
