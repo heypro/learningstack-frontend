@@ -146,7 +146,7 @@ const App: React.FC = () => {
       <h2>window.Telegram.WebApp (all fields):</h2>
       <pre style={{ background: '#333', color: '#fff', padding: 16, overflow: 'auto' }}>
         {typeof window !== 'undefined' && window.Telegram && window.Telegram.WebApp
-          ? JSON.stringify(window.Telegram.WebApp, (key, value) => {
+          ? JSON.stringify(window.Telegram.WebApp, (_, value) => {
               if (typeof value === 'function') return '[Function]';
               return value;
             }, 2)
