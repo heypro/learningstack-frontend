@@ -1,58 +1,55 @@
 import { useEffect, useState } from 'react';
-import { retrieveLaunchParams } from '@telegram-apps/sdk';
+import type { FC } from 'react';
+import {
+  initDataRaw as _initDataRaw,
+  initDataState as _initDataState,
+  useSignal,
+} from '@telegram-apps/sdk-react';
 
-type UserData = Record<string, string>;
+export const InitDataDebugPage: FC = () => {
+  const initDataRaw = useSignal(_initDataRaw);
+  const initDataState = useSignal(_initDataState);
 
-function App() {
-  const [userData, setUserData] = useState<UserData | null>(null);
+  const [backendResponse, setBackendResponse] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function authorize() {
-      try {
-        const { initDataRaw, initData } = retrieveLaunchParams();
-        console.log(initData)
-        console.log("initDataRaw:", initDataRaw);
+    if (!initDataRaw) return;
 
+    // POST raw init data to backend
+    (async () => {
+      try {
         const res = await fetch('/api/auth/', {
           method: 'POST',
           headers: {
             Authorization: `tma ${initDataRaw}`,
           },
         });
-
-        if (!res.ok) {
-          const errText = await res.text();
-          setError(`Auth failed: ${errText}`);
-          return;
-        }
-
-        const data: UserData = await res.json();
-        setUserData(data);
-      } catch (e: any) {
-        setError(`Error: ${e.message || 'Unknown error'}`);
+        const data = await res.json().catch(() => null);
+        setBackendResponse(data);
+      } catch (e) {
+        setError(String(e));
       }
-    }
-
-    authorize();
-  }, []);
-
-  if (error) return <div>Error: {error}</div>;
-
-  if (!userData) return <div>Loading...</div>;
+    })();
+  }, [initDataRaw]);
 
   return (
-    <div>
-      <h1>User Data</h1>
-      <ul>
-        {Object.entries(userData).map(([key, value]) => (
-          <li key={key}>
-            <b>{key}</b>: {value}
-          </li>
-        ))}
-      </ul>
+    <div style={{ padding: 20, fontFamily: 'monospace' }}>
+      <h2>Debug: Init Data Raw</h2>
+      <pre>{JSON.stringify(initDataRaw, null, 2)}</pre>
+
+      <h2>Debug: Init Data State</h2>
+      <pre>{JSON.stringify(initDataState, null, 2)}</pre>
+
+      <h2>Backend Response</h2>
+      <pre>{backendResponse ? JSON.stringify(backendResponse, null, 2) : 'Waiting for response...'}</pre>
+
+      {error && (
+        <>
+          <h2>Error</h2>
+          <pre>{error}</pre>
+        </>
+      )}
     </div>
   );
-}
-
-export default App;
+};
