@@ -53,3 +53,5 @@ export const InitDataDebugPage: FC = () => {
     </div>
   );
 };
+
+export default InitDataDebugPage;
